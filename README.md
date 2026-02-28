@@ -113,22 +113,8 @@ Abrir en el navegador:
 http://127.0.0.1:5000/
 📷 Evidencia de Funcionamiento
 
-capturas del sistema mostrando:
+![Uploading image.png…]()
 
-Pantalla principal: <img width="1266" height="913" alt="image" src="https://github.com/user-attachments/assets/5897e35f-88f5-418a-9943-c51e33f982a8" />
-
-
-Registro de herramientas
-
-Gestión de préstamos
-
-Integración con APIs
-
-Funcionamiento con base de datos MySQL
-
-(Insertar aquí las imágenes del sistema)
-
-🎥 Video Demostrativo
 
 Enlace al video explicativo del proyecto:
 
