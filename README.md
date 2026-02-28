@@ -113,7 +113,8 @@ Abrir en el navegador:
 http://127.0.0.1:5000/
 📷 Evidencia de Funcionamiento
 
-![Uploading image.png…]()
+
+![Uploading Captura de pantalla 2026-02-28 003242.png…]()
 
 
 Enlace al video explicativo del proyecto:
