@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Videos Educativos - Sistema de Gestión</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .navbar h1 {
+            font-size: 20px;
+        }
+
+        .navbar a {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .navbar a:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .page-header {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .page-header h2 {
+            color: #1565c0;
+            margin-bottom: 10px;
+        }
+
+        /* Sección de búsqueda */
+        .search-section {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .search-section h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .search-box input:focus {
+            border-color: #1565c0;
+        }
+
+        .search-box button {
+            background: #1565c0;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .search-box button:hover {
+            background: #0d47a1;
+        }
+
+        .search-box button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* Categorías sugeridas */
+        .categories-section {
+            margin-top: 20px;
+        }
+
+        .categories-section h4 {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .category-chips {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .category-chip {
+            background: #e3f2fd;
+            color: #1565c0;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .category-chip:hover {
+            background: #1565c0;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Resultados */
+        .results-section {
+            margin-top: 30px;
+        }
+
+        .results-header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px 10px 0 0;
+            border-bottom: 3px solid #1565c0;
+        }
+
+        .results-header h3 {
+            color: #1565c0;
+            font-size: 18px;
+        }
+
+        .results-count {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .videos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            background: white;
+            padding: 25px;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .video-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .video-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            border-color: #1565c0;
+        }
+
+        .video-thumbnail {
+            position: relative;
+            padding-top: 56.25%;
+            background: #000;
+            overflow: hidden;
+        }
+
+        .video-thumbnail img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .video-thumbnail .play-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .video-card:hover .play-overlay {
+            opacity: 1;
+        }
+
+        .play-button {
+            width: 70px;
+            height: 70px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            color: #1565c0;
+        }
+
+        .video-info {
+            padding: 20px;
+        }
+
+        .video-title {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 8px;
+            font-weight: 600;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .video-description {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 12px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .video-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #999;
+        }
+
+        .video-channel {
+            font-weight: 600;
+        }
+
+        /* Estados de carga */
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #1565c0;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            fill: #ccc;
+        }
+
+        /* Modal para video */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            overflow: auto;
+        }
+
+        .modal-content {
+            position: relative;
+            margin: 5% auto;
+            max-width: 1200px;
+            width: 90%;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            color: white;
+            font-size: 35px;
+            font-weight: bold;
+            cursor: pointer;
+            background: rgba(0,0,0,0.5);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .close-modal:hover {
+            background: rgba(0,0,0,0.8);
+        }
+
+        .video-player {
+            position: relative;
+            padding-top: 56.25%;
+            background: #000;
+        }
+
+        .video-player iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .video-details {
+            background: white;
+            padding: 25px;
+            border-radius: 0 0 10px 10px;
+        }
+
+        .video-details h3 {
+            color: #1565c0;
+            margin-bottom: 10px;
+        }
+
+        .video-details p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        @media (max-width: 768px) {
+            .videos-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            .search-box button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>🎓 Videos Educativos</h1>
+        <a href="{{ url_for('dashboard_alumno') }}">← Regresar</a>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h2>Busca Videos Sobre Herramientas</h2>
+            <p>Encuentra tutoriales, guías de seguridad y más sobre el uso correcto de herramientas de laboratorio</p>
+        </div>
+
+        <!-- Sección de búsqueda -->
+        <div class="search-section">
+            <h3>🔍 Buscar Videos</h3>
+            <div class="search-box">
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    placeholder="Ej: multímetro, soldadura, osciloscopio, seguridad eléctrica..."
+                    onkeypress="if(event.key==='Enter') buscarVideos()"
+                >
+                <button onclick="buscarVideos()" id="searchBtn">Buscar</button>
+            </div>
+
+            <!-- Categorías sugeridas -->
+            <div class="categories-section">
+                <h4>Categorías sugeridas:</h4>
+                <div class="category-chips">
+                    <div class="category-chip" onclick="buscarPorCategoria('seguridad')">🛡️ Seguridad</div>
+                    <div class="category-chip" onclick="buscarPorCategoria('medicion')">📏 Medición</div>
+                    <div class="category-chip" onclick="buscarPorCategoria('soldadura')">🔥 Soldadura</div>
+                    <div class="category-chip" onclick="buscarPorCategoria('herramientas')">🔧 Herramientas</div>
+                    <div class="category-chip" onclick="buscarPorCategoria('mantenimiento')">⚙️ Mantenimiento</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resultados -->
+        <div class="results-section" id="resultsSection" style="display: none;">
+            <div class="results-header">
+                <h3 id="resultsTitle">Resultados de búsqueda</h3>
+                <p class="results-count" id="resultsCount"></p>
+            </div>
+            <div class="videos-grid" id="videosGrid">
+                <!-- Videos se cargan aquí dinámicamente -->
+            </div>
+        </div>
+
+        <!-- Estado vacío inicial -->
+        <div class="empty-state" id="emptyState">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M21 3H3c-1.11 0-2 .89-2 2v12c0 1.1.89 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.11-.9-2-2-2zm0 14H3V5h18v12z"/>
+            </svg>
+            <h3>Busca videos educativos</h3>
+            <p>Usa el buscador o selecciona una categoría para comenzar</p>
+        </div>
+
+        <!-- Estado de carga -->
+        <div class="loading" id="loadingState" style="display: none;">
+            <div class="loading-spinner"></div>
+            <p>Buscando videos...</p>
+        </div>
+    </div>
+
+    <!-- Modal para reproducir video -->
+    <div id="videoModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="cerrarVideo()">×</span>
+            <div class="video-player">
+                <iframe id="videoFrame" src="" allowfullscreen></iframe>
+            </div>
+            <div class="video-details">
+                <h3 id="videoTitle"></h3>
+                <p id="videoDescription"></p>
+                <p style="margin-top: 10px; color: #999; font-size: 14px;">
+                    <strong>Canal:</strong> <span id="videoChannel"></span> | 
+                    <strong>Publicado:</strong> <span id="videoDate"></span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Función principal de búsqueda
+        async function buscarVideos() {
+            const query = document.getElementById('searchInput').value.trim();
+            
+            if (!query) {
+                alert('Por favor ingresa un término de búsqueda');
+                return;
+            }
+
+            mostrarCargando();
+
+            try {
+                const response = await fetch(`/videos/buscar?q=${encodeURIComponent(query)}&max=9`);
+                const data = await response.json();
+
+                if (data.success) {
+                    mostrarResultados(data.videos, query);
+                } else {
+                    mostrarError(data.error);
+                }
+            } catch (error) {
+                mostrarError('Error al buscar videos. Intenta nuevamente.');
+                console.error('Error:', error);
+            }
+        }
+
+        // Buscar por categoría
+        async function buscarPorCategoria(categoria) {
+            // Mapeo de categorías a términos de búsqueda
+            const busquedas = {
+                'seguridad': 'seguridad laboratorio electrónica',
+                'medicion': 'instrumentos de medición tutorial',
+                'soldadura': 'técnicas de soldadura',
+                'herramientas': 'herramientas básicas laboratorio',
+                'mantenimiento': 'mantenimiento de herramientas'
+            };
+
+            document.getElementById('searchInput').value = busquedas[categoria] || categoria;
+            buscarVideos();
+        }
+
+        // Mostrar resultados
+        function mostrarResultados(videos, query) {
+            const resultsSection = document.getElementById('resultsSection');
+            const emptyState = document.getElementById('emptyState');
+            const loadingState = document.getElementById('loadingState');
+            const videosGrid = document.getElementById('videosGrid');
+            const resultsTitle = document.getElementById('resultsTitle');
+            const resultsCount = document.getElementById('resultsCount');
+
+            // Ocultar estados
+            emptyState.style.display = 'none';
+            loadingState.style.display = 'none';
+
+            if (videos.length === 0) {
+                resultsSection.style.display = 'block';
+                resultsTitle.textContent = 'Sin resultados';
+                resultsCount.textContent = `No se encontraron videos para "${query}"`;
+                videosGrid.innerHTML = '<div class="empty-state"><p>Intenta con otros términos de búsqueda</p></div>';
+                return;
+            }
+
+            // Mostrar resultados
+            resultsSection.style.display = 'block';
+            resultsTitle.textContent = `Resultados para "${query}"`;
+            resultsCount.textContent = `Se encontraron ${videos.length} video(s)`;
+
+            // Generar HTML de videos
+            videosGrid.innerHTML = videos.map(video => `
+                <div class="video-card" onclick='abrirVideo(${JSON.stringify(video)})'>
+                    <div class="video-thumbnail">
+                        <img src="${video.thumbnail}" 
+                             alt="${video.titulo}"
+                             onerror="this.src='${video.thumbnail}'">
+                        <div class="play-overlay">
+                            <div class="play-button">▶</div>
+                        </div>
+                    </div>
+                    <div class="video-info">
+                        <h4 class="video-title">${video.titulo}</h4>
+                        <p class="video-description">${video.descripcion}</p>
+                        <div class="video-meta">
+                            <span class="video-channel">📺 ${video.canal}</span>
+                            <span>${video.fecha_publicacion}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Abrir video en modal
+        function abrirVideo(video) {
+            const modal = document.getElementById('videoModal');
+            const frame = document.getElementById('videoFrame');
+            const titleElement = document.getElementById('videoTitle');
+            const descElement = document.getElementById('videoDescription');
+            const channelElement = document.getElementById('videoChannel');
+            const dateElement = document.getElementById('videoDate');
+
+            frame.src = `https://www.youtube.com/embed/${video.youtube_id}?autoplay=1`;
+            titleElement.textContent = video.titulo;
+            descElement.textContent = video.descripcion;
+            channelElement.textContent = video.canal;
+            dateElement.textContent = video.fecha_publicacion;
+
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Cerrar video
+        function cerrarVideo() {
+            const modal = document.getElementById('videoModal');
+            const frame = document.getElementById('videoFrame');
+
+            frame.src = '';
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Cerrar modal al hacer clic fuera
+        window.onclick = function(event) {
+            const modal = document.getElementById('videoModal');
+            if (event.target === modal) {
+                cerrarVideo();
+            }
+        }
+
+        // Cerrar con ESC
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                cerrarVideo();
+            }
+        });
+
+        // Mostrar estado de carga
+        function mostrarCargando() {
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('resultsSection').style.display = 'none';
+            document.getElementById('loadingState').style.display = 'block';
+        }
+
+        // Mostrar error
+        function mostrarError(mensaje) {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('resultsSection').style.display = 'block';
+            document.getElementById('videosGrid').innerHTML = `
+                <div class="alert alert-error">
+                    <strong>Error:</strong> ${mensaje}
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

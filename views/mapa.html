@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mapa con Flask</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AAIzaSyDcTcibMsfO6a1A--qCXy-bZ7tZv-eQaRw"></script>
+</head>
+<body>
+
+<h2>Selecciona una ubicación</h2>
+<div id="map" style="width: 100%; height: 400px;"></div>
+
+<script>
+function initMap() {
+    const inicial = { lat: 19.4326, lng: -99.1332 };
+
+    const map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 10,
+        center: inicial
+    });
+
+    let marcador = new google.maps.Marker({
+        position: inicial,
+        map: map,
+        draggable: true
+    });
+
+    google.maps.event.addListener(marcador, "dragend", function() {
+        let nuevaPos = marcador.getPosition();
+
+        fetch("/guardar_ubicacion", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                latitud: nuevaPos.lat(),
+                longitud: nuevaPos.lng()
+            })
+        })
+        .then(response => response.json())
+        .then(data => console.log("Respuesta:", data));
+    });
+}
+
+window.onload = initMap;
+</script>
+
+</body>
+</html>

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Inventario - UTNG</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f5f5f5; }
+
+        .navbar {
+            background: linear-gradient(135deg, #d84315, #bf360c);
+            color: white; padding: 15px 30px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .navbar h1 { font-size: 20px; }
+        .navbar a {
+            background: rgba(255,255,255,0.2); color: white;
+            padding: 8px 16px; border-radius: 5px; text-decoration: none; font-size: 14px;
+        }
+
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+
+        .card {
+            background: white; border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 25px;
+        }
+
+        .card-header {
+            padding: 20px 25px; border-bottom: 1px solid #e0e0e0;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .card-header h2 { color: #d84315; font-size: 18px; }
+
+        .card-body { padding: 25px; }
+
+        /* Formulario */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block; font-size: 13px;
+            font-weight: 600; color: #555; margin-bottom: 5px;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 9px 12px;
+            border: 1px solid #ddd; border-radius: 6px;
+            font-size: 14px; font-family: inherit;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none; border-color: #d84315;
+        }
+        .form-group textarea { resize: vertical; height: 60px; }
+
+        .btn {
+            padding: 9px 20px; border: none; border-radius: 6px;
+            font-size: 14px; font-weight: 600; cursor: pointer;
+        }
+        .btn-primary { background: #d84315; color: white; }
+        .btn-primary:hover { background: #bf360c; }
+        .btn-warning { background: #f57c00; color: white; }
+        .btn-warning:hover { background: #e65100; }
+        .btn-danger { background: #c62828; color: white; }
+        .btn-danger:hover { background: #b71c1c; }
+        .btn-sm { padding: 5px 12px; font-size: 12px; }
+
+        /* Flash */
+        .alert {
+            padding: 12px 20px; border-radius: 6px;
+            margin-bottom: 20px; font-size: 14px;
+        }
+        .alert-success { background: #d4edda; color: #155724; }
+        .alert-error { background: #f8d7da; color: #721c24; }
+
+        /* Tabla */
+        table { width: 100%; border-collapse: collapse; }
+        thead th {
+            background: #f5f5f5; padding: 12px 15px;
+            text-align: left; font-size: 13px;
+            color: #555; border-bottom: 2px solid #e0e0e0;
+        }
+        tbody td {
+            padding: 12px 15px; border-bottom: 1px solid #f0f0f0;
+            font-size: 14px; color: #333;
+        }
+        tbody tr:hover { background: #fafafa; }
+
+        .badge {
+            padding: 3px 10px; border-radius: 12px;
+            font-size: 11px; font-weight: 600;
+        }
+        .badge-green { background: #d4edda; color: #155724; }
+        .badge-orange { background: #fff3cd; color: #856404; }
+        .badge-red { background: #f8d7da; color: #721c24; }
+
+        .actions { display: flex; gap: 6px; }
+
+        /* Modal */
+        .modal-overlay {
+            display: none; position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center; align-items: center; z-index: 999;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: white; border-radius: 10px;
+            padding: 30px; width: 500px; max-width: 95%;
+        }
+        .modal h3 { color: #d84315; margin-bottom: 20px; }
+        .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+        .btn-secondary { background: #e0e0e0; color: #333; }
+    </style>
+</head>
+<body>
+<nav class="navbar">
+    <h1>📋 Inventario de Herramientas</h1>
+    <a href="{{ url_for('dashboard_laboratorista') }}">← Regresar</a>
+</nav>
+
+<div class="container">
+
+    {% with messages = get_flashed_messages() %}
+      {% for msg in messages %}
+        <div class="alert alert-success">{{ msg }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <!-- Formulario agregar -->
+    <div class="card">
+        <div class="card-header">
+            <h2>Agregar Herramienta</h2>
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                <input type="hidden" name="accion" value="agregar">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Código de Inventario *</label>
+                        <input type="text" name="codigo" required placeholder="Ej: MULT-001">
+                    </div>
+                    <div class="form-group">
+                        <label>Nombre *</label>
+                        <input type="text" name="nombre" required placeholder="Ej: Multímetro Digital">
+                    </div>
+                    <div class="form-group">
+                        <label>Categoría</label>
+                        <select name="categoria">
+                            <option value="">Sin categoría</option>
+                            <option value="Medición">Medición</option>
+                            <option value="Alimentación">Alimentación</option>
+                            <option value="Prototipado">Prototipado</option>
+                            <option value="Herramienta Manual">Herramienta Manual</option>
+                            <option value="Soldadura">Soldadura</option>
+                            <option value="Electrónica">Electrónica</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Cantidad Total *</label>
+                        <input type="number" name="cantidad_total" required min="1" placeholder="0">
+                    </div>
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label>Descripción</label>
+                        <textarea name="descripcion" placeholder="Descripción opcional..."></textarea>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Agregar Herramienta</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="card">
+        <div class="card-header">
+            <h2>Herramientas Registradas</h2>
+            <span style="font-size:14px; color:#888;">{{ herramientas|length }} herramientas</span>
+        </div>
+        <div class="card-body" style="padding: 0;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Nombre</th>
+                        <th>Categoría</th>
+                        <th>Descripción</th>
+                        <th>Total</th>
+                        <th>Disponibles</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for h in herramientas %}
+                <tr>
+                    <td><strong>{{ h.codigo_inventario }}</strong></td>
+                    <td>{{ h.nombre }}</td>
+                    <td>{{ h.categoria or '—' }}</td>
+                    <td style="color:#888; font-size:13px;">{{ h.descripcion or '—' }}</td>
+                    <td>{{ h.cantidad_total }}</td>
+                    <td>{{ h.cantidad_disponible }}</td>
+                    <td>
+                        {% if h.cantidad_disponible == 0 %}
+                        <span class="badge badge-red">Agotado</span>
+                        {% elif h.cantidad_disponible < h.cantidad_total * 0.3 %}
+                        <span class="badge badge-orange">Limitado</span>
+                        {% else %}
+                        <span class="badge badge-green">Disponible</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="actions">
+                            <button class="btn btn-warning btn-sm"
+                                onclick="abrirEditar({{ h.id_herramienta }}, '{{ h.codigo_inventario }}', '{{ h.nombre }}', '{{ h.descripcion or '' }}', '{{ h.categoria or '' }}', {{ h.cantidad_total }})">
+                                Editar
+                            </button>
+                            <button class="btn btn-danger btn-sm"
+                                onclick="confirmarEliminar({{ h.id_herramienta }}, '{{ h.nombre }}')">
+                                Eliminar
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="8" style="text-align:center; padding:30px; color:#999;">No hay herramientas registradas</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar -->
+<div class="modal-overlay" id="modalEditar">
+    <div class="modal">
+        <h3>Editar Herramienta</h3>
+        <form method="POST">
+            <input type="hidden" name="accion" value="editar">
+            <input type="hidden" name="id_herramienta" id="edit_id">
+            <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
+                <div class="form-group">
+                    <label>Código *</label>
+                    <input type="text" name="codigo" id="edit_codigo" required>
+                </div>
+                <div class="form-group">
+                    <label>Nombre *</label>
+                    <input type="text" name="nombre" id="edit_nombre" required>
+                </div>
+                <div class="form-group">
+                    <label>Categoría</label>
+                    <select name="categoria" id="edit_categoria">
+                        <option value="">Sin categoría</option>
+                        <option value="Medición">Medición</option>
+                        <option value="Alimentación">Alimentación</option>
+                        <option value="Prototipado">Prototipado</option>
+                        <option value="Herramienta Manual">Herramienta Manual</option>
+                        <option value="Soldadura">Soldadura</option>
+                        <option value="Electrónica">Electrónica</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Cantidad Total *</label>
+                    <input type="number" name="cantidad_total" id="edit_cantidad" required min="1">
+                </div>
+                <div class="form-group" style="grid-column: span 2;">
+                    <label>Descripción</label>
+                    <textarea name="descripcion" id="edit_descripcion"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Eliminar -->
+<div class="modal-overlay" id="modalEliminar">
+    <div class="modal">
+        <h3>Confirmar Eliminación</h3>
+        <p style="margin-bottom:20px;">¿Estás seguro que deseas eliminar <strong id="eliminar_nombre"></strong>?</p>
+        <form method="POST">
+            <input type="hidden" name="accion" value="eliminar">
+            <input type="hidden" name="id_herramienta" id="eliminar_id">
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
+                <button type="submit" class="btn btn-danger">Eliminar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function abrirEditar(id, codigo, nombre, descripcion, categoria, cantidad) {
+    document.getElementById('edit_id').value = id;
+    document.getElementById('edit_codigo').value = codigo;
+    document.getElementById('edit_nombre').value = nombre;
+    document.getElementById('edit_descripcion').value = descripcion;
+    document.getElementById('edit_categoria').value = categoria;
+    document.getElementById('edit_cantidad').value = cantidad;
+    document.getElementById('modalEditar').classList.add('active');
+}
+
+function confirmarEliminar(id, nombre) {
+    document.getElementById('eliminar_id').value = id;
+    document.getElementById('eliminar_nombre').textContent = nombre;
+    document.getElementById('modalEliminar').classList.add('active');
+}
+
+function cerrarModal() {
+    document.getElementById('modalEditar').classList.remove('active');
+    document.getElementById('modalEliminar').classList.remove('active');
+}
+</script>
+</body>
+</html>

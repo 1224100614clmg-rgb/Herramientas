@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitud de Préstamo</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f0f0;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .navbar h1 { font-size: 20px; }
+
+        .navbar a {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .navbar a:hover { background: rgba(255,255,255,0.3); }
+
+        .container {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        .form-panel {
+            background: #e8e8e8;
+            border: 1px solid #999;
+            box-shadow: inset 0 0 3px rgba(0,0,0,0.1);
+        }
+
+        .panel-header {
+            background: linear-gradient(to bottom, #f0f0f0, #d8d8d8);
+            border-bottom: 2px solid #1565c0;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-header h2 {
+            font-weight: bold;
+            color: #333;
+            font-size: 18px;
+        }
+
+        .id-solicitud {
+            background: white;
+            border: 1px solid #999;
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 450px;
+            gap: 15px;
+            padding: 15px;
+        }
+
+        .left-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .section {
+            border: 2px solid #4a7ebb;
+            background: #e0e8f0;
+        }
+
+        .section-title {
+            background: linear-gradient(to bottom, #5c8dcc, #4a7ebb);
+            color: white;
+            padding: 6px 12px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .section-content {
+            padding: 15px;
+            background: white;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        .form-row.triple {
+            grid-template-columns: 140px 1fr 80px 100px;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: #333;
+            font-size: 12px;
+        }
+
+        .form-input, .form-select {
+            padding: 5px 8px;
+            border: 1px solid #999;
+            background: white;
+            font-size: 12px;
+            font-family: inherit;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: 2px solid #1565c0;
+            border-color: #1565c0;
+        }
+
+        .readonly-field {
+            background: #f0f0f0;
+            color: #666;
+            cursor: not-allowed;
+        }
+
+        .date-input-wrapper {
+            position: relative;
+            width: 180px;
+        }
+
+        .date-input {
+            width: 100%;
+            padding: 5px 25px 5px 8px;
+            border: 1px solid #999;
+            background: white;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .calendar-icon {
+            position: absolute;
+            right: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        .calendar-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border: 2px solid #1565c0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+            margin-top: 2px;
+        }
+
+        .calendar-dropdown.active { display: block; }
+
+        .calendar-header {
+            background: linear-gradient(to bottom, #5c8dcc, #4a7ebb);
+            color: white;
+            padding: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .calendar-nav {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 4px 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .calendar-nav:hover { background: rgba(255,255,255,0.3); }
+
+        .calendar-month-year {
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 32px);
+            gap: 1px;
+            padding: 8px;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            font-weight: bold;
+            font-size: 10px;
+            padding: 4px;
+            color: #666;
+        }
+
+        .calendar-day {
+            text-align: center;
+            padding: 6px 4px;
+            cursor: pointer;
+            font-size: 11px;
+            border: 1px solid transparent;
+        }
+
+        .calendar-day:hover {
+            background: #e3f2fd;
+            border-color: #1565c0;
+        }
+
+        .calendar-day.today {
+            background: #fff3cd;
+            font-weight: bold;
+        }
+
+        .calendar-day.selected {
+            background: #1565c0;
+            color: white;
+            font-weight: bold;
+        }
+
+        .calendar-day.disabled {
+            color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #999;
+        }
+
+        .details-table th {
+            background: linear-gradient(to bottom, #e0e0e0, #d0d0d0);
+            padding: 8px;
+            text-align: left;
+            border: 1px solid #999;
+            font-weight: bold;
+            font-size: 11px;
+        }
+
+        .details-table td {
+            padding: 8px;
+            border: 1px solid #ccc;
+            background: white;
+            font-size: 11px;
+        }
+
+        .details-table tbody tr:hover { background: #f5f5f5; }
+        .details-table tbody tr.selected { background: #d0e8ff; }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .btn {
+            padding: 6px 16px;
+            border: 1px solid #999;
+            font-size: 12px;
+            cursor: pointer;
+            font-family: inherit;
+            box-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .btn-agregar {
+            background: linear-gradient(to bottom, #90c090, #70a070);
+            color: white;
+        }
+
+        .btn-editar {
+            background: linear-gradient(to bottom, #c0c0ff, #a0a0e0);
+            color: #333;
+        }
+
+        .btn-eliminar {
+            background: linear-gradient(to bottom, #ff9090, #e07070);
+            color: white;
+        }
+
+        .btn-guardar {
+            background: linear-gradient(to bottom, #90c0ff, #7090cc);
+            color: white;
+            font-weight: bold;
+            padding: 8px 24px;
+        }
+
+        .btn:active { box-shadow: inset 1px 1px 2px rgba(0,0,0,0.3); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .empty-state {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+            font-style: italic;
+            font-size: 11px;
+        }
+
+        .footer-actions {
+            padding: 15px;
+            text-align: right;
+            background: #e8e8e8;
+            border-top: 1px solid #999;
+        }
+
+        @media (max-width: 1200px) {
+            .main-content { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>🔧 Solicitud de Préstamo</h1>
+        <a href="{{ url_for('dashboard_alumno') }}">← Regresar</a>
+    </nav>
+
+    <div class="container">
+        <div class="form-panel">
+            <div class="panel-header">
+                <h2>Solicitud préstamo</h2>
+                <div class="id-solicitud">
+                    <label>ID Solicitud:</label>
+                    <span>Pendiente</span>
+                </div>
+            </div>
+
+            <form id="solicitudForm" action="{{ url_for('solicitar_herramienta') }}" method="POST">
+                <div class="main-content">
+                    <div class="left-section">
+                        <div class="section">
+                            <div class="section-title">INFORMACIÓN DEL SOLICITANTE</div>
+                            <div class="section-content">
+                                <div class="form-row">
+                                    <label class="form-label">Num control:</label>
+                                    <input type="text" class="form-input readonly-field" value="{{ session.usuario }}" readonly>
+                                </div>
+                                <div class="form-row">
+                                    <label class="form-label">Alumno:</label>
+                                    <input type="text" class="form-input readonly-field" value="{{ session.nombre }}" readonly>
+                                </div>
+                                <div class="form-row triple">
+                                    <label class="form-label">Carrera:</label>
+                                    <input type="text" class="form-input readonly-field" value="Ingeniería" readonly>
+                                    <label class="form-label" style="text-align: right;">Grupo:</label>
+                                    <input type="text" id="grupoInput" name="grupo" class="form-input" placeholder="Ej: 5A" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="section">
+                            <div class="section-title">INFORMACIÓN DE LA SOLICITUD</div>
+                            <div class="section-content">
+                                <div class="form-row">
+                                    <label class="form-label">Fecha solicitud:</label>
+                                    <div class="date-input-wrapper">
+                                        <input type="text" id="fechaSolicitud" class="date-input" readonly placeholder="Seleccionar" required>
+                                        <span class="calendar-icon">📅</span>
+                                        <div class="calendar-dropdown" id="calendarDropdown">
+                                            <div class="calendar-header">
+                                                <button type="button" class="calendar-nav" id="prevMonth">◀</button>
+                                                <span class="calendar-month-year" id="currentMonthYear"></span>
+                                                <button type="button" class="calendar-nav" id="nextMonth">▶</button>
+                                            </div>
+                                            <div class="calendar-grid" id="calendarGrid"></div>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" id="fechaSolicitudHidden" name="fecha_solicitud">
+                                </div>
+                                <div class="form-row">
+                                    <label class="form-label">Herramienta:</label>
+                                    <select id="herramientaSelect" class="form-select">
+                                        <option value="">-- Seleccionar --</option>
+                                        {% for h in herramientas %}
+                                        <option value="{{ h.id_herramienta }}"
+                                            data-nombre="{{ h.nombre }}">
+                                        {{ h.nombre }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="form-row">
+                                    <label class="form-label">Cantidad:</label>
+                                    <input type="number" id="cantidadInput" class="form-input" min="1" value="1" style="width: 80px;">
+                                </div>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-agregar" onclick="agregarHerramienta()">Agregar</button>
+                                    <button type="button" class="btn btn-editar" onclick="editarSeleccionado()" disabled id="btnEditar">Editar</button>
+                                    <button type="button" class="btn btn-eliminar" onclick="eliminarSeleccionado()" disabled id="btnEliminar">Eliminar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-title">DETALLES</div>
+                        <div class="section-content">
+                            <table class="details-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 80px;">Cantidad</th>
+                                        <th>Herramienta</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="detallesBody">
+                                    <tr><td colspan="2" class="empty-state">No hay herramientas agregadas</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <input type="hidden" name="herramientas_json" id="herramientasJson">
+
+                <div class="footer-actions">
+                    <button type="submit" class="btn btn-guardar">Guardar Solicitud</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let herramientasAgregadas = [], filaSeleccionada = null, currentDate = new Date(), selectedDate = null;
+
+        function renderCalendar(date) {
+            const year = date.getFullYear(), month = date.getMonth();
+            const monthNames = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+            document.getElementById('currentMonthYear').textContent = `${monthNames[month]} ${year}`;
+            
+            const grid = document.getElementById('calendarGrid');
+            grid.innerHTML = '';
+            
+            ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'].forEach(day => {
+                const h = document.createElement('div');
+                h.className = 'calendar-day-header';
+                h.textContent = day;
+                grid.appendChild(h);
+            });
+            
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            for (let i = 0; i < firstDay; i++) {
+                grid.appendChild(Object.assign(document.createElement('div'), {className: 'calendar-day disabled'}));
+            }
+            
+            const today = new Date();
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayEl = document.createElement('div');
+                dayEl.className = 'calendar-day';
+                dayEl.textContent = day;
+                const dayDate = new Date(year, month, day);
+                if (dayDate.toDateString() === today.toDateString()) dayEl.classList.add('today');
+                if (selectedDate && dayDate.toDateString() === selectedDate.toDateString()) dayEl.classList.add('selected');
+                dayEl.onclick = () => selectDate(dayDate);
+                grid.appendChild(dayEl);
+            }
+        }
+
+        function selectDate(date) {
+            selectedDate = date;
+            document.getElementById('fechaSolicitud').value = date.toLocaleDateString('es-MX');
+            document.getElementById('fechaSolicitudHidden').value = date.toISOString().split('T')[0];
+            renderCalendar(currentDate);
+            document.getElementById('calendarDropdown').classList.remove('active');
+        }
+
+        document.getElementById('fechaSolicitud').addEventListener('click', () => document.getElementById('calendarDropdown').classList.toggle('active'));
+        document.getElementById('prevMonth').addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(currentDate); });
+        document.getElementById('nextMonth').addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(currentDate); });
+        document.addEventListener('click', e => {
+            const cal = document.getElementById('calendarDropdown'), inp = document.getElementById('fechaSolicitud');
+            if (!cal.contains(e.target) && e.target !== inp) cal.classList.remove('active');
+        });
+
+        document.getElementById('herramientaSelect').addEventListener('change', function() {
+            const opt = this.options[this.selectedIndex];
+            if (opt.value) document.getElementById('cantidadInput').max = opt.dataset.disponible;
+        });
+
+        function agregarHerramienta() {
+            const sel = document.getElementById('herramientaSelect');
+            const cant = parseInt(document.getElementById('cantidadInput').value);
+            if (!sel.value) return alert('Selecciona una herramienta');
+            if (cant < 1) return alert('Cantidad mínima: 1');
+            const opt = sel.options[sel.selectedIndex];
+            if (cant > parseInt(opt.dataset.disponible)) return alert(`Solo hay ${opt.dataset.disponible} disponibles`);
+            if (herramientasAgregadas.find(h => h.id === sel.value)) return alert('Ya agregada. Usa "Editar".');
+            herramientasAgregadas.push({id: sel.value, nombre: opt.dataset.nombre, cantidad: cant});
+            actualizarTabla();
+            sel.value = '';
+            document.getElementById('cantidadInput').value = '1';
+        }
+
+        function actualizarTabla() {
+            const tbody = document.getElementById('detallesBody');
+            tbody.innerHTML = '';
+            if (!herramientasAgregadas.length) {
+                tbody.innerHTML = '<tr><td colspan="2" class="empty-state">No hay herramientas agregadas</td></tr>';
+                document.getElementById('btnEditar').disabled = document.getElementById('btnEliminar').disabled = true;
+                return;
+            }
+            herramientasAgregadas.forEach((item, i) => {
+                const row = tbody.insertRow();
+                row.dataset.index = i;
+                row.style.cursor = 'pointer';
+                row.onclick = () => seleccionarFila(row);
+                row.insertCell(0).textContent = item.cantidad;
+                row.insertCell(1).textContent = item.nombre;
+            });
+        }
+
+        function seleccionarFila(row) {
+            if (filaSeleccionada) filaSeleccionada.classList.remove('selected');
+            filaSeleccionada = row;
+            row.classList.add('selected');
+            document.getElementById('btnEditar').disabled = document.getElementById('btnEliminar').disabled = false;
+        }
+
+        function editarSeleccionado() {
+            if (!filaSeleccionada) return;
+            const item = herramientasAgregadas[parseInt(filaSeleccionada.dataset.index)];
+            const n = prompt('Nueva cantidad:', item.cantidad);
+            if (n && !isNaN(n) && n > 0) { item.cantidad = parseInt(n); actualizarTabla(); }
+        }
+
+        function eliminarSeleccionado() {
+            if (!filaSeleccionada && confirm('¿Eliminar?')) {
+                herramientasAgregadas.splice(parseInt(filaSeleccionada.dataset.index), 1);
+                filaSeleccionada = null;
+                actualizarTabla();
+            }
+        }
+
+        document.getElementById('solicitudForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (!selectedDate) return alert('Selecciona una fecha');
+            if (!herramientasAgregadas.length) return alert('Agrega al menos una herramienta');
+            if (!document.getElementById('grupoInput').value.trim()) return alert('Ingresa tu grupo');
+            document.getElementById('herramientasJson').value = JSON.stringify(herramientasAgregadas);
+            this.submit();
+        });
+
+        renderCalendar(currentDate);
+        selectDate(new Date());
+    </script>
+</body>
+</html>

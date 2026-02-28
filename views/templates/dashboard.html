@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Sistema de Gestión de Herramientas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .navbar h1 {
+            font-size: 22px;
+        }
+
+        .navbar .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .navbar .user-info span {
+            font-size: 14px;
+        }
+
+        .navbar .logout-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .navbar .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .welcome-section {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .welcome-section h2 {
+            color: #1565c0;
+            margin-bottom: 10px;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .menu-card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+
+        .menu-card .icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: #1565c0;
+        }
+
+        .menu-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .menu-card p {
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>Sistema de Gestión de Herramientas - UTNG</h1>
+        <div class="user-info">
+            <span>Bienvenido, {{ usuario }}</span>
+            <button class="logout-btn" onclick="window.location.href='{{ url_for('logout') }}'">Cerrar Sesión</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="welcome-section">
+            <h2>Panel de Control</h2>
+            <p>Gestione el inventario de herramientas de manera eficiente</p>
+        </div>
+
+        <div class="menu-grid">
+            <a href="{{ url_for('herramientas') }}" class="menu-card">
+                <div class="icon">🔧</div>
+                <h3>Herramientas</h3>
+                <p>Catálogo completo de herramientas</p>
+            </a>
+
+            <a href="{{ url_for('prestamos') }}" class="menu-card">
+                <div class="icon">📋</div>
+                <h3>Préstamos</h3>
+                <p>Gestionar préstamos y devoluciones</p>
+            </a>
+
+            <a href="{{ url_for('inventario') }}" class="menu-card">
+                <div class="icon">📦</div>
+                <h3>Inventario</h3>
+                <p>Control de stock y existencias</p>
+            </a>
+
+            <a href="{{ url_for('reportes') }}" class="menu-card">
+                <div class="icon">📊</div>
+                <h3>Reportes</h3>
+                <p>Estadísticas y reportes del sistema</p>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Realizar Pago - UTNG</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f5f5f5; }
+
+        .navbar {
+            background: linear-gradient(135deg, #1565c0, #0d47a1);
+            color: white; padding: 15px 30px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .navbar h1 { font-size: 20px; }
+        .navbar a {
+            background: rgba(255,255,255,0.2); color: white;
+            padding: 8px 16px; border-radius: 5px; text-decoration: none;
+        }
+
+        .container {
+            max-width: 550px; margin: 50px auto; padding: 0 20px;
+        }
+
+        .card {
+            background: white; border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1); overflow: hidden;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #1565c0, #0d47a1);
+            padding: 25px 30px; color: white;
+        }
+        .card-header h2 { font-size: 22px; margin-bottom: 5px; }
+        .card-header p { font-size: 13px; opacity: 0.85; }
+
+        .card-body { padding: 30px; }
+
+        .info-row {
+            display: flex; justify-content: space-between;
+            align-items: center; padding: 14px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .info-row:last-of-type { border-bottom: none; }
+        .info-label { font-size: 13px; color: #888; }
+        .info-value { font-size: 14px; font-weight: 600; color: #333; }
+
+        .monto-section {
+            background: #e3f2fd; border-radius: 8px;
+            padding: 20px; text-align: center; margin: 20px 0;
+        }
+        .monto-label { font-size: 12px; color: #1565c0; margin-bottom: 6px; }
+        .monto-valor {
+            font-size: 36px; font-weight: bold; color: #1565c0;
+        }
+        .monto-moneda { font-size: 16px; color: #666; margin-top: 2px; }
+
+        .btn-paypal {
+            width: 100%; padding: 14px;
+            background: #0070ba; color: white;
+            border: none; border-radius: 8px;
+            font-size: 16px; font-weight: bold;
+            cursor: pointer; transition: background 0.3s;
+            display: flex; align-items: center;
+            justify-content: center; gap: 10px;
+        }
+        .btn-paypal:hover { background: #005ea6; }
+
+        .aviso {
+            text-align: center; margin-top: 15px;
+            font-size: 12px; color: #999;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <h1>💳 Pago de Daño</h1>
+    <a href="{{ url_for('pagos.mis_danos') }}">← Regresar</a>
+</nav>
+
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <h2>Resumen de Pago</h2>
+            <p>Revisa los detalles antes de continuar con PayPal</p>
+        </div>
+        <div class="card-body">
+
+            <div class="info-row">
+                <span class="info-label">N° Solicitud</span>
+                <span class="info-value">#{{ solicitud.id }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Herramienta</span>
+                <span class="info-value">{{ herramienta.nombre }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Alumno</span>
+                <span class="info-value">{{ herramienta.alumno }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Descripción del daño</span>
+                <span class="info-value">{{ herramienta.descripcion }}</span>
+            </div>
+
+            <div class="monto-section">
+                <div class="monto-label">MONTO A PAGAR</div>
+                <div class="monto-valor">${{ "%.2f"|format(herramienta.monto_deposito) }}</div>
+                <div class="monto-moneda">{{ herramienta.moneda }}</div>
+            </div>
+
+            <form method="POST">
+                <input type="hidden" name="amount" value="{{ herramienta.monto_deposito }}">
+                <input type="hidden" name="currency" value="{{ herramienta.moneda }}">
+                <input type="hidden" name="herramienta_nombre" value="{{ herramienta.nombre }}">
+
+                <button type="submit" class="btn-paypal">
+                    💳 Pagar con PayPal
+                </button>
+            </form>
+
+            <p class="aviso">Serás redirigido a PayPal para completar el pago de forma segura.</p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
